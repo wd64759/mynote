@@ -17,17 +17,24 @@ docker logs -f pid
 docker run image:tag # 启动并进入容器 
 docker run -it image:tag /bin/bash # 以交互方式运行容器 -i, -t 为启动虚拟终端
 docker run --name alpine-dev -p 1022:22 -v d:\tmp:/mnt/tmp -d alpine # -d 为后台运行
+docker run -d -p 4200:4200 jared/webctx # 注意在window下的docker容器是跑着虚拟机上的，访问的IP地址需要使用虚拟机启动的ip
 
 docker ps -a # 查看容器（包含停止状态的）
 ```
 
-* Export/Input Images
+* Container 管理
 ``` bash
-docker save -o abc.tar jarta/jre8:1.0      # 导出镜像到tar文件
-docker import jarta_img.tar jarta/jre8:1.0 # 导入文件到镜像
+docker container ls -a | awk '{print$1}' # 列出所有创建过的容器
+docker rm $(docker container ls -qa)  # 删除所有容器
 ```
 
 
+* Export/Input Images
+``` bash
+docker container ls
+docker save -o abc.tar jarta/jre8:1.0      # 导出镜像到tar文件
+docker import jarta_img.tar jarta/jre8:1.0 # 导入文件到镜像
+```
 
 * Advanced
 ``` bash
