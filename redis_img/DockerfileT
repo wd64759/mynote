@@ -1,0 +1,7 @@
+FROM debian:stable
+LABEL maintainer="wei dong"
+ENV APP_DIR /usr/local
+ENV RS_VERSION 5.0.7
+ADD http://download.redis.io/releases/redis-${RS_VERSION}.tar.gz /
+RUN mkdir -p ${APP_DIR}/redis 
+WORKDIR /redis-${RS_VERSION}
