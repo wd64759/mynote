@@ -1,8 +1,9 @@
 import sys
 import random
+import keyboard
 
 canvas = [[1,0,0,0,0,0,1],[1,0,0,0,0,0,1],[1,0,0,0,0,0,1],[1,0,0,0,0,0,1],[1,0,0,0,0,0,1],[1,1,1,1,1,1,1]]
-bricks = [[9,9],[9,0]], [[9,9],[9,9]], [[9,0],[9,0]]
+bricks = [[1,1],[1,0]], [[1,1],[1,1]], [[1,0],[1,0]]
 rnd_p = random.randint(0, len(bricks) - 1)
 rnd_r = random.randint(0, 3)
 
@@ -20,10 +21,25 @@ def rotate(brick, times):
     return to_brick(t)
 
 def mov_brick(brick, loc):    
-    to_x, to_y = loc; i = 0;
+    to_x, to_y = loc; i = 0
     for bl in brick:
        canvas[to_x + i][to_y:to_y + len(bl)] = bl
        i += 1    
+
+def clean_brick(brick, loc):
+    to_x, to_y = loc; i = 0
+    for bl in brick:
+        rev_line = [x^1 for x in bl]
+        reg_area = canvas[to_x + i][to_y:to_y + len(bl)]
+        up_area = [x[0]&x[1] for x in zip(rev_line, reg_area)]
+        canvas[to_x + i][to_y:to_y + len(bl)] = up_area
+
+def set_pixel(x, y, signal):
+    print(x, y, signal)
+
+def refresh_line(loc_x):
+    for i,y in canvas[loc_x][1:-1]:
+        set_pixel(loc_x, i, y)
 
 def hit_check(brick, loc):
     to_x, to_y = loc; i = 0; hit = False
@@ -31,7 +47,7 @@ def hit_check(brick, loc):
         overlap = canvas[to_x + i][to_y:to_y + len(bl)]
         i += 1; el = 0
         while el < len(bl):
-            if overlap[el] + bl[el] > 9:
+            if overlap[el] + bl[el] > 1:
                 hit = True
                 break
             el += 1
@@ -42,35 +58,11 @@ def out_range(brick, loc):
     r_chk = (to_x > 0 and to_x < len(canvas) - len(brick))
     return r_chk if not r_chk else (to_y > 0 and to_y < len(canvas[0]) - len(brick[0]))
 
-def clean_brick(brick, loc):
-    to_x, to_y = loc; i = 0; hit = False
-    for bl in brick:
-        loc_x, loc_y = to_x + i + 1, to_y + 1 
-        overlap = canvas[loc_x][loc_y:loc_y + len(bl)]
-        el = 0
-        while el < len(bl):
-            if bl[el] > 1:
-                canvas[loc_x][loc_y + el] = 0
-
-# def upd_canvas(brick, loc):
-#     to_x, to_y = loc; i = 0
-#     for bl in brick:
-#         canvas[to_x + i][to_y:to_y + len(bl)] = bl
-
-
-
-def redraw():
-    pass
-    # display.set_pixel(x, y, brick[0])
-    # display.set_pixel(x, y + 1, brick[1])
-    # display.set_pixel(x + 1, y, brick[2])
-    # display.set_pixel(x + 1, y + 1, brick[3])
-
 def mprint(box):
     for line in box:
         print(line)
 
-def main():
+def test():
     # chosen = rotate(bricks[rnd_p], rnd_r)
     mprint(canvas)
     b = bricks[2]
@@ -93,5 +85,30 @@ def main():
             print("move brick")
             mov_brick(t, loc)
             mprint(canvas)
+
+            print("clean brick")
+            clean_brick(t, (2,0))
+            mprint(canvas)
+
+def key_down(x):
+    loc_x, loc_y = 0, 0
+    if x.event_type == 'down' and x.event_name == 'left':
+        loc_y = -1
+    if x.event_type == 'down' and x.event_name == 'right':
+        loc_y = 1
+    if x.event_type == 'down' and x.event_name == 'down':
+        loc_x = 1
+
+    return loc_x, loc_y
+
+def main():
+    keyboard.hook(key_down)
+    keyboard.wait()
+    # gameOn = True
+    # frameCount = 0
+    # while gameOn:
+    #     # sleep(50)
+    #     print('sleep -- 50')
+
 
 main()
